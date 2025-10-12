@@ -73,7 +73,7 @@ export default function SettingsScreen() {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 20 }}>
       <Text style={styles.sectionTitle}>Pengaturan</Text>
       {renderInput("Kapasitas Tangki (L)", "tank_capacity", 5)}
       {renderInput("Konsumsi Rata-rata (km/L)", "avg_consumption", 40)}

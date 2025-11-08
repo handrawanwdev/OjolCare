@@ -1,4 +1,7 @@
 {
   "name": "OjolCare",
-  "displayName": "OjolCare"
+  "displayName": "OjolCare",
+  "plugins": [
+    "@notifee/react-native"
+  ]
 }

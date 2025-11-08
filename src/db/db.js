@@ -25,6 +25,7 @@ export const ServiceLogSchema = {
     id: "int",
     component: "string",
     odometer: "double",
+    is_complete: "bool",
     cost: "double",
     date: "string",
     note: "string?"

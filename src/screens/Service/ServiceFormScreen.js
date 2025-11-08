@@ -51,6 +51,7 @@ export default function ServiceFormScreen({ navigation }) {
       odometer: Number(form.odometer),
       cost: Number(form.cost),
       date: form.date.toISOString().split('T')[0],
+      is_complete: false,
       note: form.note,
     });
 

@@ -1,12 +1,12 @@
 // screens/Dashboard/DashboardScreen.js
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { getFuelLogs } from '../../db/fuelService';
-import { getAlerts, handleFuelAlert, handleServiceAlert } from '../../db/alertService';
+import { notifyFuelAndServiceAlerts } from '../../db/alertService';
 import { getSettings } from '../../db/settingsService';
 import { calculateFuelStats } from '../../utils/fuelCalculator';
 
@@ -48,9 +48,7 @@ export default function DashboardScreen() {
         remainingFuelFromRange: calculated.remainingFuelFromRange,
       });
 
-      handleFuelAlert();
-      handleServiceAlert();
-      setAlerts(getAlerts() || []);
+      setAlerts(notifyFuelAndServiceAlerts() || []);
     }, [])
   );
 
@@ -95,7 +93,7 @@ export default function DashboardScreen() {
       {alerts.length === 0 ? (
         <Text style={styles.noData}>Tidak ada alert</Text>
       ) : (
-        alerts.map(alert => (
+        alerts.filter(alert => !alert.is_complete).map(alert => (
           <View
             key={alert.id}
             style={[
@@ -111,6 +109,7 @@ export default function DashboardScreen() {
             <View style={{ marginLeft: 12 }}>
               <Text style={styles.alertMessage}>{alert.message}</Text>
               <Text style={styles.alertMeta}>{alert.type} | {alert.date}</Text>
+              <Text style={styles.alertMeta}>Status: {alert.is_complete ? 'Selesai' : 'Belum'}</Text>
             </View>
           </View>
         ))

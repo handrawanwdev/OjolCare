@@ -2,13 +2,7 @@
 import React, {useRef, useEffect} from "react";
 import { StatusBar, SafeAreaView, StyleSheet } from "react-native";
 import Navigation from "./src/Navigation";
-import {
-  requestNotificationPermission,
-  showLocalNotification,
-  registerForegroundNotificationEvents,
-  ensureDefaultChannel,
-  scheduleInSeconds,
-} from './src/utils/notifications';
+import { initBackgroundTasks } from './src/bgTasks';
 
 export default function App() {
   const unsubRef = useRef(null);
@@ -16,15 +10,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       console.log('Welcome to OjolCare');
-      await ensureDefaultChannel();
-      await requestNotificationPermission(); // Android 13+ dan iOS
-      await showLocalNotification({
-        title: 'Welcome to OjolCare',
-        body: 'Thank you for using our app!',
-      });
-      
-      // @ts-ignore
-      unsubRef.current = registerForegroundNotificationEvents();
+      await initBackgroundTasks();
     })();
 
     return () => {

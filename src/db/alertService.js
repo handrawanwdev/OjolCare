@@ -122,8 +122,6 @@ export function notifyFuelAndServiceAlerts() {
   }
 
   const serviceLogs = getServiceLogs();
-  if (fuelLogs.length < 2) return; // butuh minimal 2 log untuk hitung jarak tempuh
-
   const lastOdometer = fuelLogs[0].odometer || 0;
 
   // Cek apakah sudah melewati jarak servis berikutnya

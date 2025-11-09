@@ -90,7 +90,7 @@ export default function DashboardScreen() {
 
       {/* Alerts */}
       <Text style={styles.subheading}>Alerts</Text>
-      {alerts.length === 0 ? (
+      {alerts.filter(alert => !alert.is_complete).length === 0 ? (
         <Text style={styles.noData}>Tidak ada alert</Text>
       ) : (
         alerts.filter(alert => !alert.is_complete).map(alert => (

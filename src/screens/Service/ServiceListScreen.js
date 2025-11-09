@@ -21,7 +21,7 @@ export default function ServiceListScreen({ navigation }) {
   // Refresh daftar service setiap kali screen difokuskan
   useFocusEffect(
     React.useCallback(() => {
-      const logs = [...getServiceLogs()];
+      const logs = [...getServiceLogs()].sort((a, b) => new Date(b.date) - new Date(a.date));
       setServiceLogs(logs);
 
       // Otomatis tampilkan modal untuk log pertama yang belum punya status

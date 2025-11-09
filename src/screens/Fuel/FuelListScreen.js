@@ -13,7 +13,7 @@ export default function FuelListScreen({ navigation }) {
   // Update daftar setiap kali screen difokuskan
   useFocusEffect(
     React.useCallback(() => {
-      setFuelLogs([...getFuelLogs()]);
+      setFuelLogs([...getFuelLogs()].sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)));
     }, [])
   );
 

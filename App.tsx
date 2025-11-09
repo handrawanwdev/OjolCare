@@ -5,16 +5,15 @@ import Navigation from "./src/Navigation";
 import { initBackgroundTasks } from './src/bgTasks';
 
 export default function App() {
-  const unsubRef = useRef(null);
+  const unsubRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     (async () => {
-      console.log('Welcome to OjolCare');
       await initBackgroundTasks();
+      console.log('Welcome to OjolCare');
     })();
 
     return () => {
-      // @ts-ignore
       if (unsubRef.current) unsubRef.current();
     };
   }, []);

@@ -13,22 +13,19 @@ async function ensureChannel() {
   await notifee.createChannel({
     id: 'default',
     name: 'Default',
-    importance: AndroidImportance.HIGH,
-    sound: 'default', // 🔊 gunakan suara default Android
+    importance: AndroidImportance.HIGH
   });
 }
 
 async function showNotification(title, body) {
-  await ensureChannel();
+  const channelId = await ensureChannel();
   await notifee.displayNotification({
     title,
     body,
     android: {
-      channelId: 'default',
+      channelId,
       smallIcon: 'ic_launcher', // ganti ke 'ic_notification' bila sudah punya
       pressAction: { id: 'open' },
-      sound: 'default', // pastikan juga diset di sini
-      importance: AndroidImportance.HIGH,
     },
   });
 }
@@ -56,6 +53,8 @@ async function runServiceCheck() {
 
 async function onEvent(taskId) {
   try {
+    console.log('[BackgroundFetch] taskId:', taskId);
+    
     if (taskId === FUEL_TASK_ID) {
       await runFuelCheck();
     } else if (taskId === SERVICE_TASK_ID) {
@@ -73,6 +72,7 @@ async function onEvent(taskId) {
 }
 
 export async function initBackgroundTasks() {
+  console.log('Initializing background tasks...');
   // Minta izin notifikasi (Android 13+)
   try { await notifee.requestPermission(); } catch {}
 
@@ -81,8 +81,8 @@ export async function initBackgroundTasks() {
   // Daftarkan callback untuk event BG saat app hidup
   await BackgroundFetch.configure(
     {
-      minimumFetchInterval: 10, // menit; ini untuk default task (opsional)
-      stopOnTerminate: true,
+      minimumFetchInterval: 5, // menit; ini untuk default task (opsional)
+      stopOnTerminate: false,
       startOnBoot: true,
       enableHeadless: true,
       requiredNetworkType: BackgroundFetch.NETWORK_TYPE_NONE,
@@ -97,10 +97,10 @@ export async function initBackgroundTasks() {
   // Jadwalkan task FUEL tiap 5 menit
   await BackgroundFetch.scheduleTask({
     taskId: FUEL_TASK_ID,
-    delay: 10 * 60 * 1000, // 10 menit
+    delay: 5 * 60 * 1000, // 20 menit
     periodic: true,// ulangi terus
     forceAlarmManager: true, // lebih agresif (Doze)
-    stopOnTerminate: true, // tetap jalan walau app dimatikan
+    stopOnTerminate: false, // tetap jalan walau app dimatikan
     startOnBoot: true, // mulai saat boot
     enableHeadless: true, // jalankan saat app mati
     requiredNetworkType: BackgroundFetch.NETWORK_TYPE_NONE,
@@ -112,7 +112,7 @@ export async function initBackgroundTasks() {
     delay: 3 * 60 * 60 * 1000, // 3 jam
     periodic: true, // ulangi terus
     forceAlarmManager: true, // lebih agresif (Doze)
-    stopOnTerminate: true, // tetap jalan walau app dimatikan
+    stopOnTerminate: false, // tetap jalan walau app dimatikan
     startOnBoot: true, // mulai saat boot
     enableHeadless: true, // jalankan saat app mati
     requiredNetworkType: BackgroundFetch.NETWORK_TYPE_NONE,
@@ -123,6 +123,8 @@ export async function initBackgroundTasks() {
 export function registerHeadlessTask() {
   BackgroundFetch.registerHeadlessTask(async event => {
     const { taskId } = event;
+    console.log('[BackgroundFetch] onEvent:', taskId);
+    await showNotification('Background Task', `Running task: ${taskId}`);
     await onEvent(taskId);
   });
 }

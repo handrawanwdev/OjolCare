@@ -81,7 +81,7 @@ export async function initBackgroundTasks() {
   // Daftarkan callback untuk event BG saat app hidup
   await BackgroundFetch.configure(
     {
-      minimumFetchInterval: 15, // menit; ini untuk default task (opsional)
+      minimumFetchInterval: 5, // menit; ini untuk default task (opsional)
       stopOnTerminate: false,
       startOnBoot: true,
       enableHeadless: true,
@@ -94,10 +94,10 @@ export async function initBackgroundTasks() {
     }
   );
 
-  // Jadwalkan task FUEL tiap 20 menit
+  // Jadwalkan task FUEL tiap 5 menit
   await BackgroundFetch.scheduleTask({
     taskId: FUEL_TASK_ID,
-    delay: 15 * 60 * 1000, // 15 menit
+    delay: 5 * 60 * 1000, // 5 menit
     periodic: true,
     forceAlarmManager: true, // lebih agresif (Doze)
     stopOnTerminate: false,

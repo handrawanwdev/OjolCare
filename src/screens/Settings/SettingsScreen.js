@@ -45,6 +45,17 @@ export default function SettingsScreen() {
     Alert.alert("Sukses", "Pengaturan berhasil diperbarui!");
   };
 
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
+
 
   const renderInput = (label, key, recommended) => (
     <View style={styles.inputContainer}>
@@ -85,7 +96,9 @@ export default function SettingsScreen() {
           <View key={h.id} style={styles.card}>
             <Text style={{ fontWeight: "600" }}>Skor: {h.score}</Text>
             <Text>Komentar: {h.comment}</Text>
-            <Text style={styles.date}>{h.updated_at}</Text>
+            {/* <Text style={styles.date}>{h.updated_at}</Text> */}
+            {/* Tanggal bisa diformat lebih baik dengan library date-fns atau moment */}
+            <Text style={styles.date}>{formatDate(h.updated_at)}</Text>
           </View>
         ))
       }

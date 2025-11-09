@@ -17,6 +17,15 @@ export default function FuelListScreen({ navigation }) {
     }, [])
   );
 
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -33,8 +42,8 @@ export default function FuelListScreen({ navigation }) {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <CardItem
-              title={`${item.date} ${item.time} - ${item.liter} L - ${item.fuel_type}`}
-              subtitle={`Odometer: ${item.odometer} km | Harga: ${item.price}`}
+              title={`${formatDate(item.date)} ${item.time} - ${item.liter} L - ${item.fuel_type}`}
+              subtitle={`Odometer: ${item.odometer} km | Biaya: ${item.price}`}
             />
           )}
           contentContainerStyle={{ paddingBottom: 16 }}

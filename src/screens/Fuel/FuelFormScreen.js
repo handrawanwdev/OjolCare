@@ -173,8 +173,8 @@ export default function FuelFormScreen({ navigation }) {
         />
       </View>
 
-      {/* Price */}
-      <Text style={styles.label}>Harga</Text>
+      {/* Biaya */}
+      <Text style={styles.label}>Biaya</Text>
       <View style={{ marginBottom: 12 }}>
         <TextInputStyled
           value={form.price}

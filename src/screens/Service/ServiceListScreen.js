@@ -49,7 +49,6 @@ export default function ServiceListScreen({ navigation }) {
       // Jika implementasi penyimpanan perlu async/berbeda, tangani sesuai kebutuhan
       console.warn('Gagal update status log:', e);
     }
-    console.log(selectedLog.id, status);
     
     // Update di state UI
     setServiceLogs(prev =>
@@ -60,10 +59,19 @@ export default function ServiceListScreen({ navigation }) {
     setSelectedLog(null);
   };
 
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   const renderItem = ({ item }) => (
     <TouchableOpacity activeOpacity={0.8} onPress={() => openConfirm(item)}>
       <CardItem
-        title={`${item.is_complete ? '✅ ' : '❌ '} ${item.date} - ${item.component.toUpperCase()}`}
+        title={`${item.is_complete ? '✅ ' : '❌ '} ${formatDate(item.date)} - ${item.component.toUpperCase()}`}
         subtitle={`Odometer: ${item.odometer} km | Biaya: ${item.cost}`}
         rightContent={
           <View style={[styles.badge, item.is_complete ? styles.badgeSuccess : styles.badgePending]}>

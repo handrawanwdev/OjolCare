@@ -36,5 +36,5 @@ export const calculateHealthScore = () => {
   score = Math.min(score, 100);
 
   // Jangan pakai write di sini, dipanggil dari transaction utama
-  addHealthScore({ score, comment: "Auto calculated based on fuel & service logs", updated_at: new Date().toISOString() });
+  addHealthScore({ score, comment: "Dihitung otomatis berdasarkan log bahan bakar & servis", updated_at: new Date().toISOString() });
 };

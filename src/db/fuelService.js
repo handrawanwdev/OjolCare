@@ -25,9 +25,10 @@ export const resetOdometer = () => {
   if (!settings) return;
 
   realm.write(() => {
-    const fuelLogs = realm.objects("FuelLog");
-    fuelLogs.forEach(log => {
-      log.odometer = 0;
-    });
+    // delete all fuel logs
+    const allLogs = realm.objects("FuelLog");
+    realm.delete(allLogs);
+
+    calculateHealthScore();
   });
 }

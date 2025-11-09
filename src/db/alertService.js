@@ -110,7 +110,6 @@ export function notifyFuelAndServiceAlerts() {
   }
 
   const serviceLogs = getServiceLogs();
-  if (!settings || fuelLogs.length === 0) return; // motor baru, skip
   if (fuelLogs.length < 2) return; // butuh minimal 2 log untuk hitung jarak tempuh
 
   const lastOdometer = fuelLogs[0].odometer || 0;

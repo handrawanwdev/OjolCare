@@ -233,6 +233,7 @@ export default function FuelFormScreen({ navigation }) {
           onValueChange={itemValue =>
             setForm({ ...form, fuel_type: itemValue })
           }
+          itemStyle={{ color: 'black', fontSize: 16 }} // <-- di sini ubah warnanya
         >
           {fuelTypes.map((type, index) => (
             <Picker.Item key={index} label={type} value={type} />

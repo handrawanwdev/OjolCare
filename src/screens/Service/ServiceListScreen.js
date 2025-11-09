@@ -126,7 +126,7 @@ export default function ServiceListScreen({ navigation }) {
             <Text style={styles.modalTitle}>Sudah di-service?</Text>
             <Text style={styles.modalText}>
               {selectedLog
-                ? `Tandai status untuk: ${selectedLog.component} (${selectedLog.date})`
+                ? `Tandai status untuk: ${selectedLog.component.toUpperCase()} (${formatDate(selectedLog.date)})`
                 : 'Tandai status service'}
             </Text>
             <View style={styles.modalActions}>

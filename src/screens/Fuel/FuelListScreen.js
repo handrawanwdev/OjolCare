@@ -26,6 +26,36 @@ export default function FuelListScreen({ navigation }) {
     });
   };
 
+  const abbreviateNumber = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+
+    // Pastikan angka bersih
+    const numericValue = Number(value.toString().replace(/\D/g, ''));
+    if (isNaN(numericValue)) return '';
+
+    // Format singkatan
+    if (numericValue >= 1000000) {
+      return (numericValue / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    } else if (numericValue >= 1000) {
+      return (numericValue / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    } else {
+      // Format ribuan biasa
+      return numericValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+  };
+
+  const formatNumber = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+
+    // Pastikan angka bersih
+    const numericValue = Number(value.toString().replace(/\D/g, ''));
+    if (isNaN(numericValue)) return '';
+
+    // Format ribuan biasa
+    return numericValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+  
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -43,7 +73,7 @@ export default function FuelListScreen({ navigation }) {
           renderItem={({ item }) => (
             <CardItem
               title={`${formatDate(item.date)} ${item.time} - ${item.liter} L - ${item.fuel_type}`}
-              subtitle={`Odometer: ${item.odometer} km | Biaya: ${item.price}`}
+              subtitle={`Odometer: ${formatNumber(item.odometer)} km | Biaya: ${abbreviateNumber(item.price)}`}
             />
           )}
           contentContainerStyle={{ paddingBottom: 16 }}

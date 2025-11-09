@@ -68,11 +68,40 @@ export default function ServiceListScreen({ navigation }) {
     });
   };
 
+  const abbreviateNumber = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+
+    // Pastikan angka bersih
+    const numericValue = Number(value.toString().replace(/\D/g, ''));
+    if (isNaN(numericValue)) return '';
+
+    // Format singkatan
+    if (numericValue >= 1000000) {
+      return (numericValue / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    } else if (numericValue >= 1000) {
+      return (numericValue / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    } else {
+      // Format ribuan biasa
+      return numericValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+  };
+
+  const formatNumber = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+
+    // Pastikan angka bersih
+    const numericValue = Number(value.toString().replace(/\D/g, ''));
+    if (isNaN(numericValue)) return '';
+
+    // Format ribuan biasa
+    return numericValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
   const renderItem = ({ item }) => (
     <TouchableOpacity activeOpacity={0.8} onPress={() => openConfirm(item)}>
       <CardItem
         title={`${item.is_complete ? '✅ ' : '❌ '} ${formatDate(item.date)} - ${item.component.toUpperCase()}`}
-        subtitle={`Odometer: ${item.odometer} km | Biaya: ${item.cost}`}
+        subtitle={`Odometer: ${formatNumber(item.odometer)} km | Biaya: ${abbreviateNumber(item.cost)}`}
         rightContent={
           <View style={[styles.badge, item.is_complete ? styles.badgeSuccess : styles.badgePending]}>
             <Text style={styles.badgeText}>

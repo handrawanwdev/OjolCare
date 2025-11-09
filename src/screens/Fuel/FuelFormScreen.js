@@ -104,6 +104,11 @@ export default function FuelFormScreen({ navigation }) {
               .replace(',', '.');   // ubah koma ke titik desimal
     form.odometer = odometerValue;
 
+    let priceValue = form.price
+              .replace(/\./g, '')   // hapus pemisah ribuan
+              .replace(',', '.');   // ubah koma ke titik desimal
+    form.price = priceValue;
+
     if (!validate()) {
       Alert.alert('Kesalahan Validasi', 'Silakan isi semua field dengan benar.');
       return;

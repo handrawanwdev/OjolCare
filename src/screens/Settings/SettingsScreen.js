@@ -68,7 +68,10 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 20 }}>
-      <Text style={styles.sectionTitle}>Pengaturan</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Pengaturan</Text>
+      </View>
       {renderInput("Kapasitas Tangki (L)", "tank_capacity", 5)}
       {/* {renderInput("Konsumsi Rata-rata (km/L)", "avg_consumption", 40)} */}
       {/* {renderInput("Jarak Harian (km)", "daily_distance", 80)} */}
@@ -92,6 +95,13 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: "#F3F4F6" },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 16,
+  },
+  title: { fontSize: 24, fontWeight: '700', color: '#1F2937' },
   sectionTitle: { fontSize: 18, fontWeight: "700", marginVertical: 12 },
   inputContainer: { marginBottom: 16 },
   label: { fontSize: 14, fontWeight: "600", color: "#4B5563", marginBottom: 6 },

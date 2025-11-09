@@ -14,6 +14,7 @@ async function ensureChannel() {
     id: 'default',
     name: 'Default',
     importance: AndroidImportance.HIGH,
+    sound: 'default', // 🔊 gunakan suara default Android
   });
 }
 
@@ -26,6 +27,8 @@ async function showNotification(title, body) {
       channelId: 'default',
       smallIcon: 'ic_launcher', // ganti ke 'ic_notification' bila sudah punya
       pressAction: { id: 'open' },
+      sound: 'default', // pastikan juga diset di sini
+      importance: AndroidImportance.HIGH,
     },
   });
 }
@@ -94,7 +97,7 @@ export async function initBackgroundTasks() {
   // Jadwalkan task FUEL tiap 20 menit
   await BackgroundFetch.scheduleTask({
     taskId: FUEL_TASK_ID,
-    delay: 20 * 60 * 1000, // 20 menit
+    delay: 5 * 60 * 1000, // 5 menit
     periodic: true,
     forceAlarmManager: true, // lebih agresif (Doze)
     stopOnTerminate: false,
@@ -106,8 +109,7 @@ export async function initBackgroundTasks() {
   // Jadwalkan task SERVICE tiap 6 jam
   await BackgroundFetch.scheduleTask({
     taskId: SERVICE_TASK_ID,
-    delay: 6 * 60 * 60 * 1000, // 6 jam
-    // delay: 15 * 1000, // untuk testing: 15 detik
+    delay: 3 * 60 * 60 * 1000, // 3 jam
     periodic: true,
     forceAlarmManager: true,
     stopOnTerminate: false,

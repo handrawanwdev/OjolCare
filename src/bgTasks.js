@@ -81,8 +81,8 @@ export async function initBackgroundTasks() {
   // Daftarkan callback untuk event BG saat app hidup
   await BackgroundFetch.configure(
     {
-      minimumFetchInterval: 5, // menit; ini untuk default task (opsional)
-      stopOnTerminate: false,
+      minimumFetchInterval: 10, // menit; ini untuk default task (opsional)
+      stopOnTerminate: true,
       startOnBoot: true,
       enableHeadless: true,
       requiredNetworkType: BackgroundFetch.NETWORK_TYPE_NONE,
@@ -97,12 +97,12 @@ export async function initBackgroundTasks() {
   // Jadwalkan task FUEL tiap 5 menit
   await BackgroundFetch.scheduleTask({
     taskId: FUEL_TASK_ID,
-    delay: 5 * 60 * 1000, // 5 menit
-    periodic: true,
+    delay: 10 * 60 * 1000, // 10 menit
+    periodic: true,// ulangi terus
     forceAlarmManager: true, // lebih agresif (Doze)
-    stopOnTerminate: false,
-    startOnBoot: true,
-    enableHeadless: true,
+    stopOnTerminate: true, // tetap jalan walau app dimatikan
+    startOnBoot: true, // mulai saat boot
+    enableHeadless: true, // jalankan saat app mati
     requiredNetworkType: BackgroundFetch.NETWORK_TYPE_NONE,
   });
 
@@ -110,11 +110,11 @@ export async function initBackgroundTasks() {
   await BackgroundFetch.scheduleTask({
     taskId: SERVICE_TASK_ID,
     delay: 3 * 60 * 60 * 1000, // 3 jam
-    periodic: true,
-    forceAlarmManager: true,
-    stopOnTerminate: false,
-    startOnBoot: true,
-    enableHeadless: true,
+    periodic: true, // ulangi terus
+    forceAlarmManager: true, // lebih agresif (Doze)
+    stopOnTerminate: true, // tetap jalan walau app dimatikan
+    startOnBoot: true, // mulai saat boot
+    enableHeadless: true, // jalankan saat app mati
     requiredNetworkType: BackgroundFetch.NETWORK_TYPE_NONE,
   });
 }

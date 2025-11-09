@@ -80,6 +80,18 @@ export function handleServiceAlert() {
 
 }
 
+export const formatNumber = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+
+    // Pastikan angka bersih
+    const numericValue = Number(value.toString().replace(/\D/g, ''));
+    if (isNaN(numericValue)) return '';
+
+    // Format ribuan biasa
+    return numericValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+  
+
 export function notifyFuelAndServiceAlerts() {
   let notifyAlert = [];
   const fuelLogs = getFuelLogs() || [];
@@ -123,7 +135,7 @@ export function notifyFuelAndServiceAlerts() {
       notifyAlert.push({
         id: serviceLog.id,
         type: 'Service',
-        message: `⚙️ Waktunya servis berkala pada jarak ${nextDue} km, untuk komponen ${serviceLog.component}`,
+        message: `⚙️ Waktunya servis berkala pada jarak ${formatNumber(nextDue)} km, untuk komponen ${serviceLog.component}`,
         status: 'unread',
         is_complete: serviceLog.is_complete,
         date: new Date().toISOString().split('T')[0],

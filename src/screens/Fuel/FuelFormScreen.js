@@ -120,17 +120,6 @@ export default function FuelFormScreen({ navigation }) {
         return;
       }
 
-      // validasi time 
-      if (Date.parse(form.date) >= Date.parse(lastLog.date)) {
-        const formTime = form.time.getHours() * 3600 + form.time.getMinutes() * 60 + form.time.getSeconds();
-        const lastLogTimeParts = lastLog.time.split(':');
-        const lastLogTime = Number(lastLogTimeParts[0]) * 3600 + Number(lastLogTimeParts[1]) * 60 + Number(lastLogTimeParts[2]);
-        
-        if (formTime <= lastLogTime) {
-          Alert.alert('Kesalahan Validasi', `Waktu tidak boleh sebelum atau sama dengan ${lastLog.time}`);
-          return;
-        }
-      }
     }
 
     if(Number(form.odometer) < lastOdometer) {

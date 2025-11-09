@@ -103,10 +103,11 @@ export default function DashboardScreen() {
           >
             <Icon
               name="bell-alert"
-              size={24}
+              size={22}
               color={alert.type === 'Fuel' ? '#F59E0B' : '#EF4444'}
+              style={{ marginTop: 2 }}
             />
-            <View style={{ marginLeft: 12 }}>
+            <View style={{ marginLeft: 10, flex: 1 }}>
               <Text style={styles.alertMessage}>{alert.message}</Text>
               <Text style={styles.alertMeta}>{alert.type} | {alert.date}</Text>
             </View>
@@ -129,17 +130,34 @@ const styles = StyleSheet.create({
   alertCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    padding: 24,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     borderRadius: 12,
-    marginBottom: 12,
+    backgroundColor: '#FEF3C7',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+    marginBottom: 12,
   },
-  alertMessage: { fontSize: 16, fontWeight: '600', color: '#1F2937' },
-  alertMeta: { fontSize: 12, color: '#6B7280', marginTop: 2 },
+
+  alertMessage: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1F2937',
+    textAlign: 'justify',
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    lineHeight: 20,
+  },
+
+  alertMeta: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 6,
+  },
+
   noData: { color: '#6B7280', fontStyle: 'italic' },
   noDataCard: {
     backgroundColor: '#FEF3C7',

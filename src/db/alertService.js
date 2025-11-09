@@ -125,7 +125,7 @@ export function notifyFuelAndServiceAlerts() {
   const lastOdometer = fuelLogs[0].odometer || 0;
 
   // Cek apakah sudah melewati jarak servis berikutnya
-  for(let serviceLog of serviceLogs) {
+  for(let serviceLog of serviceLogs.filter(s => !s.is_complete)) {
     const nextDue = serviceLog.odometer;
     if (lastOdometer >= nextDue) {
       const exists = notifyAlert.find(a => a.id === serviceLog.id);

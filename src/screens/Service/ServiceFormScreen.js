@@ -146,25 +146,35 @@ export default function ServiceFormScreen({ navigation }) {
 
       {/* Buttons */}
       <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
+        {/* Tombol Batal */}
+        <LinearGradient
+          colors={['#E5E7EB', '#D1D5DB']}
+          style={styles.buttonGradient}
         >
-          <Text style={styles.cancelText}>Batal</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.buttonBase, { backgroundColor: 'transparent' }]}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.buttonText, { color: '#1F2937' }]}>Batal</Text>
+          </TouchableOpacity>
+        </LinearGradient>
 
+        {/* Tombol Simpan */}
         <LinearGradient
           colors={['#4F46E5', '#6366F1']}
           style={styles.buttonGradient}
         >
-          <ButtonPrimary
-            title="Simpan"
+          <TouchableOpacity
+            style={[styles.buttonBase, { backgroundColor: 'transparent' }]}
             onPress={handleSubmit}
-            style={{ backgroundColor: 'transparent' }}
-            textStyle={{ color: '#fff', fontWeight: '600' }}
-          />
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.buttonText, { color: '#fff' }]}>Simpan</Text>
+          </TouchableOpacity>
         </LinearGradient>
       </View>
+
     </ScrollView>
   );
 }
@@ -230,5 +240,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
+    gap: 12, // jarak antar tombol (bisa diganti marginRight juga)
+  },
+  buttonGradient: {
+    flex: 1,
+    borderRadius: 12,
+    elevation: 3,
+  },
+  buttonBase: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

@@ -15,7 +15,6 @@ export default function SettingsScreen() {
     fuel_low_km: "50",
     service_interval: "5000"
   });
-  const [alerts, setAlerts] = useState([]);
   const [health, setHealth] = useState([]);
   const [lastOdometer, setLastOdometer] = useState(0);
 
@@ -29,11 +28,10 @@ export default function SettingsScreen() {
       service_interval: s?.service_interval?.toString() || "5000"
     });
 
-    setAlerts([...getAlerts()]);
     setHealth([...getHealthScores()]);
 
     const fuelLogs = getFuelLogs();
-    if (fuelLogs.length > 0) setLastOdometer(fuelLogs[fuelLogs.length - 1].odometer);
+    if (fuelLogs.length > 0) setLastOdometer(fuelLogs[0].odometer);
   }, []);
 
   const handleSave = () => {
@@ -47,10 +45,6 @@ export default function SettingsScreen() {
     Alert.alert("Sukses", "Pengaturan berhasil diperbarui!");
   };
 
-  const handleAlertPress = (alertId) => {
-    markAlertRead(alertId);
-    setAlerts([...getAlerts()]);
-  };
 
   const renderInput = (label, key, recommended) => (
     <View style={styles.inputContainer}>
@@ -76,33 +70,11 @@ export default function SettingsScreen() {
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 20 }}>
       <Text style={styles.sectionTitle}>Pengaturan</Text>
       {renderInput("Kapasitas Tangki (L)", "tank_capacity", 5)}
-      {renderInput("Konsumsi Rata-rata (km/L)", "avg_consumption", 40)}
-      {renderInput("Jarak Harian (km)", "daily_distance", 80)}
+      {/* {renderInput("Konsumsi Rata-rata (km/L)", "avg_consumption", 40)} */}
+      {/* {renderInput("Jarak Harian (km)", "daily_distance", 80)} */}
       {renderInput("Ambang Batas Bensin (km)", "fuel_low_km", 50)}
-      {renderInput("Interval Servis (km)", "service_interval", 5000)}
+      {/* {renderInput("Interval Servis (km)", "service_interval", 5000)} */}
       <ButtonPrimary title="Simpan Pengaturan" onPress={handleSave} style={{ marginBottom: 20 }} />
-
-      <Text style={styles.sectionTitle}>Peringatan</Text>
-      {alerts.length === 0 ? <Text>Tidak ada peringatan</Text> :
-        alerts.map((alert) => (
-          <TouchableOpacity key={alert.id} onPress={() => handleAlertPress(alert.id)}>
-            <View style={[styles.card, alert.status === "unread" && styles.unreadCard]}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Icon
-                  name="bell-alert"
-                  size={20}
-                  color={alert.type === "Fuel" ? "#F59E0B" : "#EF4444"}
-                  style={{ marginRight: 8 }}
-                />
-                <Text style={{ fontWeight: alert.status === "unread" ? "700" : "500" }}>
-                  {alert.type}: {alert.message}
-                </Text>
-              </View>
-              <Text style={styles.date}>{alert.date}</Text>
-            </View>
-          </TouchableOpacity>
-        ))
-      }
 
       <Text style={styles.sectionTitle}>Kesehatan Kendaraan</Text>
       {health.length === 0 ? <Text>Tidak ada data kesehatan</Text> :

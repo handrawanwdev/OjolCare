@@ -109,7 +109,6 @@ export default function DashboardScreen() {
             <View style={{ marginLeft: 12 }}>
               <Text style={styles.alertMessage}>{alert.message}</Text>
               <Text style={styles.alertMeta}>{alert.type} | {alert.date}</Text>
-              <Text style={styles.alertMeta}>Status: {alert.is_complete ? 'Selesai' : 'Belum'}</Text>
             </View>
           </View>
         ))
@@ -129,8 +128,8 @@ const styles = StyleSheet.create({
   infoValue: { color: '#fff', fontSize: 22, fontWeight: '700', marginTop: 4 },
   alertCard: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
+    alignItems: 'flex-start',
+    padding: 24,
     borderRadius: 12,
     marginBottom: 12,
     shadowColor: '#000',
@@ -156,7 +155,7 @@ const styles = StyleSheet.create({
     color: '#92400E',
     fontSize: 16,
     fontWeight: '600',
-    textAlign: 'center',
+    textAlign: 'left',
     marginLeft: 8,
   },
 });

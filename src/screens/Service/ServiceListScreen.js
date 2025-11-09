@@ -63,7 +63,7 @@ export default function ServiceListScreen({ navigation }) {
   const renderItem = ({ item }) => (
     <TouchableOpacity activeOpacity={0.8} onPress={() => openConfirm(item)}>
       <CardItem
-        title={`${item.date} - ${item.component}`}
+        title={`${item.is_complete ? '✅ ' : '❌ '} ${item.date} - ${item.component.toUpperCase()}`}
         subtitle={`Odometer: ${item.odometer} km | Biaya: ${item.cost}`}
         rightContent={
           <View style={[styles.badge, item.is_complete ? styles.badgeSuccess : styles.badgePending]}>
@@ -176,10 +176,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   badgeSuccess: {
-    backgroundColor: '#DCFCE7',
+    backgroundColor: '#3cd887ff',
   },
   badgePending: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#b42727ff',
   },
   badgeText: {
     fontSize: 12,

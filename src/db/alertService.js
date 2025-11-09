@@ -98,17 +98,15 @@ export function notifyFuelAndServiceAlerts() {
   const fuelLowKm = Number(settings.fuel_low_km) || 30;
   // console.log('Remaining Range:', stats.remainingRange, 'Fuel Low Km Threshold:', fuelLowKm);
 
-  if (Number(stats.remainingRange) < fuelLowKm) {
-    const exists = notifyAlert.find(a => a.type === 'Fuel' && a.status === 'unread');
-    if (!exists) {
-      notifyAlert.push({
-        id: Date.now(),
-        type: 'Fuel',
-        message: `⛽ Bensin hampir habis, prediksi sisa jarak ${stats.remainingRange} km`,
-        status: 'unread',
-        date: new Date().toISOString().split('T')[0],
-      });
-    }
+  if (Number(stats.remainingRange) < Number(fuelLowKm)) {
+    notifyAlert.push({
+      id: Date.now(),
+      type: 'Fuel',
+      message: `⛽ Bensin hampir habis, prediksi sisa jarak ${stats.remainingRange} km`,
+      status: 'unread',
+      is_complete: false,
+      date: new Date().toISOString().split('T')[0],
+    });
   }
 
   const serviceLogs = getServiceLogs();

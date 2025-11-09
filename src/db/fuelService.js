@@ -11,12 +11,6 @@ export const addFuelLog = (data) => {
 
     realm.create("FuelLog", { id: Date.now(), ...data, consumption, prediction });
 
-    // alert & health dipanggil di dalam transaction → aman
-    const settings = getSettings();
-    if (settings && data.liter < settings.tank_capacity * 0.1) {
-      addAlert({ type: "Fuel", message: `Fuel low: ${data.liter}L`, date: new Date().toISOString(), status: "unread" });
-    }
-
     calculateHealthScore();
   });
 };

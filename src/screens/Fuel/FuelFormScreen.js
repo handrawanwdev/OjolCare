@@ -45,7 +45,26 @@ export default function FuelFormScreen({ navigation }) {
     'Premium',
     'Pertamax Turbo',
     'Pertamax Racing',
+    'Pertamina Dex',
+    'Pertamina Dexlite',
+    'Shell V-Power',
+    'Shell Diesel',
+    'Total Performance 95',
+    'Total Performance Diesel',
+    'BP Ultimate 98',
+    'BP Diesel',
+    'Lainnya',
   ];
+
+  // Fungsi format angka ke format ribuan Indonesia (contoh: 48000 -> 48.000)
+  const formatNumber = (value) => {
+    if (!value) return '';
+    // Hapus semua karakter non-digit
+    const numberString = value.replace(/\D/g, '');
+    // Format pakai titik ribuan
+    return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
 
   const validate = () => {
     const newErrors = {};
@@ -145,7 +164,10 @@ export default function FuelFormScreen({ navigation }) {
       <View style={{ marginBottom: 12 }}>
         <TextInputStyled
           value={form.liter}
-          onChangeText={text => setForm({ ...form, liter: text })}
+          onChangeText={text => {
+            const formatted = formatNumber(text);
+            setForm({ ...form, liter: formatted });
+          }}
           keyboardType="numeric"
           error={errors.liter}
         />
@@ -156,7 +178,10 @@ export default function FuelFormScreen({ navigation }) {
       <View style={{ marginBottom: 12 }}>
         <TextInputStyled
           value={form.price}
-          onChangeText={text => setForm({ ...form, price: text })}
+          onChangeText={text => {
+            const formatted = formatNumber(text);
+            setForm({ ...form, price: formatted });
+          }}
           keyboardType="numeric"
           error={errors.price}
         />
@@ -167,7 +192,10 @@ export default function FuelFormScreen({ navigation }) {
       <View style={{ marginBottom: 12 }}>
         <TextInputStyled
           value={form.odometer}
-          onChangeText={text => setForm({ ...form, odometer: text })}
+          onChangeText={text => {
+            const formatted = formatNumber(text);
+            setForm({ ...form, odometer: formatted });
+          }}
           keyboardType="numeric"
           error={errors.odometer}
         />
@@ -189,32 +217,36 @@ export default function FuelFormScreen({ navigation }) {
       </View>
 
       {/* Buttons */}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          marginTop: 20,
-        }}
-      >
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
+      <View style={styles.buttonRow}>
+        {/* Tombol Batal */}
+        <LinearGradient
+          colors={['#E5E7EB', '#D1D5DB']}
+          style={styles.buttonGradient}
         >
-          <Text style={styles.cancelText}>Batal</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.buttonBase, { backgroundColor: 'transparent' }]}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.buttonText, { color: '#1F2937' }]}>Batal</Text>
+          </TouchableOpacity>
+        </LinearGradient>
 
+        {/* Tombol Simpan */}
         <LinearGradient
           colors={['#4F46E5', '#6366F1']}
           style={styles.buttonGradient}
         >
-          <ButtonPrimary
-            title="Simpan"
+          <TouchableOpacity
+            style={[styles.buttonBase, { backgroundColor: 'transparent' }]}
             onPress={handleSubmit}
-            style={{ backgroundColor: 'transparent' }}
-            textStyle={{ color: '#fff', fontWeight: '600' }}
-          />
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.buttonText, { color: '#fff' }]}>Simpan</Text>
+          </TouchableOpacity>
         </LinearGradient>
       </View>
+
     </ScrollView>
   );
 }
@@ -261,6 +293,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontSize: 16,
     shadowColor: '#000',
+    color: '#111827',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -281,4 +314,25 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   cancelText: { color: '#1F2937', fontWeight: '600' },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    gap: 12,
+  },
+  buttonGradient: {
+    flex: 1,
+    borderRadius: 12,
+    elevation: 3,
+  },
+  buttonBase: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

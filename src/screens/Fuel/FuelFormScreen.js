@@ -12,9 +12,7 @@ import {
   FlatList
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
 import LinearGradient from 'react-native-linear-gradient';
-import ButtonPrimary from '../../components/ButtonPrimary';
 import { addFuelLog, getLastLog } from '../../db/fuelService';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -26,6 +24,7 @@ export default function FuelFormScreen({ navigation }) {
   if (lastLog) {
     lastOdometer = lastLog.odometer;
   }
+
   const [form, setForm] = useState({
     date: new Date(),
     time: new Date(),
@@ -109,25 +108,26 @@ export default function FuelFormScreen({ navigation }) {
       Alert.alert('Kesalahan Validasi', 'Silakan isi semua field dengan benar.');
       return;
     }
-    
-    if (Date.parse(form.date) < Date.parse(lastLog.date)) {
-      Alert.alert('Kesalahan Validasi', `Tanggal tidak boleh sebelum ${lastLog.date}`);
-      return;
-    }
 
-    // validasi time 
-    if (Date.parse(form.date) >= Date.parse(lastLog.date)) {
-      const formTime = form.time.getHours() * 3600 + form.time.getMinutes() * 60 + form.time.getSeconds();
-      const lastLogTimeParts = lastLog.time.split(':');
-      const lastLogTime = Number(lastLogTimeParts[0]) * 3600 + Number(lastLogTimeParts[1]) * 60 + Number(lastLogTimeParts[2]);
-      console.log(formTime, lastLogTime);
-      
-      if (formTime <= lastLogTime) {
-        Alert.alert('Kesalahan Validasi', `Waktu tidak boleh sebelum atau sama dengan ${lastLog.time}`);
+    if (lastLog && lastLog.date) {
+      if (Date.parse(form.date) < Date.parse(lastLog.date)) {
+        Alert.alert('Kesalahan Validasi', `Tanggal tidak boleh sebelum ${lastLog.date}`);
         return;
       }
+
+      // validasi time 
+      if (Date.parse(form.date) >= Date.parse(lastLog.date)) {
+        const formTime = form.time.getHours() * 3600 + form.time.getMinutes() * 60 + form.time.getSeconds();
+        const lastLogTimeParts = lastLog.time.split(':');
+        const lastLogTime = Number(lastLogTimeParts[0]) * 3600 + Number(lastLogTimeParts[1]) * 60 + Number(lastLogTimeParts[2]);
+        
+        if (formTime <= lastLogTime) {
+          Alert.alert('Kesalahan Validasi', `Waktu tidak boleh sebelum atau sama dengan ${lastLog.time}`);
+          return;
+        }
+      }
     }
-    
+
     if(Number(form.odometer) < lastOdometer) {
       Alert.alert('Kesalahan Validasi', `Odometer tidak boleh kurang dari ${lastOdometer} km`);
       return;

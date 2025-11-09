@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import ButtonPrimary from "../../components/ButtonPrimary";
 import { getSettings, updateSettings } from "../../db/settingsService";
-import { getAlerts, markAlertRead } from "../../db/alertService";
 import { getHealthScores } from "../../db/healthService";
-import { getFuelLogs } from "../../db/fuelService";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { getFuelLogs, resetOdometer } from "../../db/fuelService";
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 export default function SettingsScreen() {
   const [form, setForm] = useState({
@@ -89,6 +88,29 @@ export default function SettingsScreen() {
     </View>
   );
 
+  // Tambahkan fungsi reset
+  const handleResetOdometer = () => {
+    Alert.alert(
+      "Reset Odometer",
+      "Apakah Anda yakin ingin mereset odometer?",
+      [
+        {
+          text: "Batal",
+          style: "cancel",
+        },
+        {
+          text: "Ya",
+          onPress: () => {
+            resetOdometer();
+            setLastOdometer(0);
+            Alert.alert("Odometer berhasil direset!");
+          },
+        },
+      ]
+    );
+  };
+
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 20 }}>
       {/* Header */}
@@ -101,6 +123,16 @@ export default function SettingsScreen() {
       {renderInput("Ambang Batas Bensin (km)", "fuel_low_km", 50)}
       {/* {renderInput("Interval Servis (km)", "service_interval", 5000)} */}
       <ButtonPrimary title="Simpan Pengaturan" onPress={handleSave} style={{ marginBottom: 20 }} />
+      {lastOdometer > 0 && (
+        <TouchableOpacity
+          style={styles.buttonReset}
+          activeOpacity={0.8}
+          onPress={handleResetOdometer}
+        >
+          <Icon name="redo-alt" size={14} color="#fff" style={{ marginRight: 8 }} />
+          <Text style={styles.buttonResetText}>Reset Odometer</Text>
+        </TouchableOpacity>
+      )}
 
       <Text style={styles.sectionTitle}>Kesehatan Kendaraan</Text>
       {health.length === 0 ? <Text>Tidak ada data kesehatan</Text> :
@@ -147,5 +179,27 @@ const styles = StyleSheet.create({
   warningText: { color: "#F59E0B", marginTop: 4, fontSize: 12, fontWeight: "600" },
   card: { backgroundColor: "#fff", padding: 12, borderRadius: 10, marginBottom: 10 },
   unreadCard: { backgroundColor: "#FEF3C7" },
-  date: { fontSize: 12, color: "#6B7280", marginTop: 4 }
+  date: { fontSize: 12, color: "#6B7280", marginTop: 4 },
+  buttonReset: {
+    flexDirection: "row",
+    backgroundColor: "#EF4444", // merah mencolok
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  buttonResetText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+
+
 });

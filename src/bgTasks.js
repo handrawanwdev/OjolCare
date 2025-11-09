@@ -97,7 +97,7 @@ export async function initBackgroundTasks() {
   // Jadwalkan task FUEL tiap 20 menit
   await BackgroundFetch.scheduleTask({
     taskId: FUEL_TASK_ID,
-    delay: 5 * 60 * 1000, // 5 menit
+    delay: 15 * 60 * 1000, // 15 menit
     periodic: true,
     forceAlarmManager: true, // lebih agresif (Doze)
     stopOnTerminate: false,

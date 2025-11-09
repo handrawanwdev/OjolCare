@@ -56,14 +56,28 @@ export default function FuelFormScreen({ navigation }) {
     'Lainnya',
   ];
 
-  // Fungsi format angka ke format ribuan Indonesia (contoh: 48000 -> 48.000)
+  // Fungsi format angka ke format Indonesia (ribuan dengan titik, desimal dengan koma)
   const formatNumber = (value) => {
-    if (!value) return '';
-    // Hapus semua karakter non-digit
-    const numberString = value.replace(/\D/g, '');
-    // Format pakai titik ribuan
-    return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    if (value === null || value === undefined || value === '') return '';
+
+    // Ubah ke string dan pisahkan bagian desimal (jika ada)
+    const parts = value.toString().split(',');
+
+    // Ambil bagian angka sebelum koma, hapus semua karakter non-digit
+    const integerPart = parts[0].replace(/\D/g, '');
+
+    // Format ribuan pakai titik
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    // Kalau ada bagian desimal, gabungkan lagi dengan koma
+    if (parts.length > 1) {
+      const decimalPart = parts[1].replace(/\D/g, ''); // hanya angka desimal
+      return `${formattedInteger},${decimalPart}`;
+    }
+
+    return formattedInteger;
   };
+
 
 
   const validate = () => {
@@ -79,6 +93,16 @@ export default function FuelFormScreen({ navigation }) {
   };
 
   const handleSubmit = () => {
+    let literValue = form.liter
+              .replace(/\./g, '')   // hapus pemisah ribuan
+              .replace(',', '.');   // ubah koma ke titik desimal
+    form.liter = literValue;
+
+    let odometerValue = form.odometer
+              .replace(/\./g, '')   // hapus pemisah ribuan
+              .replace(',', '.');   // ubah koma ke titik desimal
+    form.odometer = odometerValue;
+    
     if (!validate()) {
       Alert.alert('Kesalahan Validasi', 'Silakan isi semua field dengan benar.');
       return;
@@ -165,8 +189,7 @@ export default function FuelFormScreen({ navigation }) {
         <TextInputStyled
           value={form.liter}
           onChangeText={text => {
-            const formatted = formatNumber(text);
-            setForm({ ...form, liter: formatted });
+            setForm({ ...form, liter: text });
           }}
           keyboardType="numeric"
           error={errors.liter}
@@ -180,6 +203,7 @@ export default function FuelFormScreen({ navigation }) {
           value={form.price}
           onChangeText={text => {
             const formatted = formatNumber(text);
+            // Ambil nilai numerik bersih (tanpa titik, ubah koma ke titik)
             setForm({ ...form, price: formatted });
           }}
           keyboardType="numeric"

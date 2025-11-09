@@ -1,5 +1,4 @@
 import { realm } from "./db";
-import { addAlert } from "./alertService";
 import { calculateHealthScore } from "./healthService";
 import { getSettings } from "./settingsService";
 
@@ -20,3 +19,15 @@ export const getLastLog = () => {
 }
 
 export const getFuelLogs = () => realm.objects("FuelLog").sorted("date", true).sorted("time", true);
+
+export const resetOdometer = () => {
+  const settings = getSettings();
+  if (!settings) return;
+
+  realm.write(() => {
+    const fuelLogs = realm.objects("FuelLog");
+    fuelLogs.forEach(log => {
+      log.odometer = 0;
+    });
+  });
+}

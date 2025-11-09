@@ -55,6 +55,13 @@ export default function ServiceFormScreen({ navigation }) {
       return;
     }
 
+    let odometerValue = form.odometer
+              .replace(/\./g, '').replace(',', '.');
+    form.odometer = odometerValue;
+    let costValue = form.cost
+              .replace(/\./g, '').replace(',', '.');
+    form.cost = costValue;
+
     addServiceLog({
       component: form.component,
       odometer: Number(form.odometer),

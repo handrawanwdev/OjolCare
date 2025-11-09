@@ -8,6 +8,8 @@ import {
   Alert,
   Platform,
   TouchableOpacity,
+  Modal,
+  FlatList
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
@@ -102,10 +104,28 @@ export default function FuelFormScreen({ navigation }) {
               .replace(/\./g, '')   // hapus pemisah ribuan
               .replace(',', '.');   // ubah koma ke titik desimal
     form.odometer = odometerValue;
-    
+
     if (!validate()) {
       Alert.alert('Kesalahan Validasi', 'Silakan isi semua field dengan benar.');
       return;
+    }
+    
+    if (Date.parse(form.date) < Date.parse(lastLog.date)) {
+      Alert.alert('Kesalahan Validasi', `Tanggal tidak boleh sebelum ${lastLog.date}`);
+      return;
+    }
+
+    // validasi time 
+    if (Date.parse(form.date) >= Date.parse(lastLog.date)) {
+      const formTime = form.time.getHours() * 3600 + form.time.getMinutes() * 60 + form.time.getSeconds();
+      const lastLogTimeParts = lastLog.time.split(':');
+      const lastLogTime = Number(lastLogTimeParts[0]) * 3600 + Number(lastLogTimeParts[1]) * 60 + Number(lastLogTimeParts[2]);
+      console.log(formTime, lastLogTime);
+      
+      if (formTime <= lastLogTime) {
+        Alert.alert('Kesalahan Validasi', `Waktu tidak boleh sebelum atau sama dengan ${lastLog.time}`);
+        return;
+      }
     }
     
     if(Number(form.odometer) < lastOdometer) {
@@ -178,7 +198,11 @@ export default function FuelFormScreen({ navigation }) {
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           onChange={(event, selectedTime) => {
             setShowTimePicker(false);
-            if (selectedTime) setForm({ ...form, time: selectedTime });
+
+            if (!selectedTime) return; // jika cancel
+
+            setForm({ ...form, time: selectedTime });
+
           }}
         />
       )}
@@ -227,19 +251,12 @@ export default function FuelFormScreen({ navigation }) {
 
       {/* Fuel Type Picker */}
       <Text style={styles.label}>Jenis Bahan Bakar</Text>
-      <View style={[styles.input, { padding: 0 }]}>
-        <Picker
-          selectedValue={form.fuel_type}
-          onValueChange={itemValue =>
-            setForm({ ...form, fuel_type: itemValue })
-          }
-          itemStyle={{ color: 'black', fontSize: 16 }} // <-- di sini ubah warnanya
-        >
-          {fuelTypes.map((type, index) => (
-            <Picker.Item key={index} label={type} value={type} />
-          ))}
-        </Picker>
-      </View>
+      <FuelTypePicker
+        selectedValue={form.fuel_type}
+        options={fuelTypes}
+        onValueChange={value => setForm({ ...form, fuel_type: value })}
+      />
+
 
       {/* Buttons */}
       <View style={styles.buttonRow}>
@@ -295,6 +312,68 @@ function TextInputStyled({
     </>
   );
 }
+
+function FuelTypePicker({ selectedValue, options, onValueChange }) {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  return (
+    <View style={{ marginBottom: 12 }}>
+      <TouchableOpacity
+        style={styles.input}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={{ color: 'black' }}>{selectedValue}</Text>
+      </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+      >
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0,0,0,0.3)',
+          }}
+          onPress={() => setModalVisible(false)}
+        >
+          <View
+            style={{
+              marginHorizontal: 30,
+              backgroundColor: 'white',
+              borderRadius: 12,
+              paddingVertical: 10,
+              maxHeight: 300,
+            }}
+          >
+            <FlatList
+              data={options}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 14,
+                    paddingHorizontal: 16,
+                    borderBottomWidth: 1,
+                    borderBottomColor: '#eee',
+                  }}
+                  onPress={() => {
+                    onValueChange(item);
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text style={{ color: 'black', fontSize: 16 }}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </View>
+  );
+}
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9FAFB', padding: 16 },

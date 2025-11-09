@@ -37,6 +37,15 @@ export default function ServiceFormScreen({ navigation }) {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Fungsi format angka ke format ribuan Indonesia (contoh: 48000 -> 48.000)
+  const formatNumber = (value) => {
+    if (!value) return '';
+    // Hapus semua karakter non-digit
+    const numberString = value.replace(/\D/g, '');
+    // Format pakai titik ribuan
+    return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
   const handleSubmit = () => {
     if (!validate()) {
       Alert.alert(
@@ -87,7 +96,10 @@ export default function ServiceFormScreen({ navigation }) {
       <Text style={styles.label}>Odometer (km)</Text>
       <TextInputStyled
         value={form.odometer}
-        onChangeText={text => setForm({ ...form, odometer: text })}
+        onChangeText={text => {
+          const formatted = formatNumber(text);
+          setForm({ ...form, odometer: formatted });
+        }}
         keyboardType="numeric"
         error={errors.odometer}
       />
@@ -96,7 +108,10 @@ export default function ServiceFormScreen({ navigation }) {
       <Text style={styles.label}>Biaya</Text>
       <TextInputStyled
         value={form.cost}
-        onChangeText={text => setForm({ ...form, cost: text })}
+        onChangeText={text => {
+          const formatted = formatNumber(text);
+          setForm({ ...form, cost: formatted });
+        }}
         keyboardType="numeric"
         error={errors.cost}
       />

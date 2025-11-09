@@ -56,6 +56,15 @@ export default function SettingsScreen() {
     });
   };
 
+  // Fungsi format angka ke format ribuan Indonesia (contoh: 48000 -> 48.000)
+  const formatNumber = (value) => {
+    if (!value) return '';
+    // Hapus semua karakter non-digit
+    const numberString = value.replace(/\D/g, '');
+    // Format pakai titik ribuan
+    return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
 
   const renderInput = (label, key, recommended) => (
     <View style={styles.inputContainer}>
@@ -64,7 +73,10 @@ export default function SettingsScreen() {
         style={styles.input}
         keyboardType="numeric"
         value={form[key]}
-        onChangeText={(text) => setForm({ ...form, [key]: text })}
+        onChangeText={text => {
+          const formatted = formatNumber(text);
+          setForm({ ...form, [key]: formatted });
+        }}
         placeholder={`Rekomendasi: ${recommended}`}
         placeholderTextColor="#aaa"
       />

@@ -2,17 +2,24 @@
 import React, {useRef, useEffect} from "react";
 import { StatusBar, SafeAreaView, StyleSheet } from "react-native";
 import Navigation from "./src/Navigation";
-import { initBackgroundTasks } from './src/bgTasks';
+import { 
+  scheduleFuelCheckOnce,
+  scheduleDailyServiceCheck
+} from './src/utils/AlertNotificationScheduler';
+import { showNotification } from './src/utils/notifications';
 
 export default function App() {
   const unsubRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    (async () => {
-      await initBackgroundTasks();
-      console.log('Welcome to OjolCare');
-    })();
-
+    console.log('Welcome to OjolCare');
+    showNotification({
+      title: 'Selamat Datang di OjolCare',
+      body: 'Asisten pribadi untuk perawatan dan pengingat kendaraan Anda.',
+    })
+    scheduleFuelCheckOnce(1 * 60 * 1000);// 1 menit untuk demo
+    // Schedule daily service check
+    scheduleDailyServiceCheck();
     return () => {
       if (unsubRef.current) unsubRef.current();
     };

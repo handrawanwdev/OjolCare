@@ -4,6 +4,8 @@ import { getSettings } from "./settingsService";
 import { calculateFuelStats } from '../utils/fuelCalculator';
 
 let alerts = [];
+let lastFuelAlertSent = null; // timestamp terakhir notifikasi bensin
+let lastLowFuelState = false; // apakah sebelumnya low fuel?
 
 export function getAlerts() {
   return alerts;
@@ -90,6 +92,27 @@ export const formatNumber = (value) => {
     // Format ribuan biasa
     return numericValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
+
+export function shouldSendFuelAlert(currentLowFuel) {
+  const now = Date.now();
+
+  // Jika sekarang tidak low fuel → reset state
+  if (!currentLowFuel) {
+    lastLowFuelState = false;
+    return false;
+  }
+
+  // Jika sebelumnya tidak low → kirim alert sekali
+  if (!lastLowFuelState) {
+    lastLowFuelState = true;
+    lastFuelAlertSent = now;
+    return true;
+  }
+
+  // Jika sebelumnya low fuel dan alert sudah dikirim → jangan kirim lagi
+  return false;
+}
+
   
 
 export function notifyFuelAndServiceAlerts() {
@@ -97,7 +120,7 @@ export function notifyFuelAndServiceAlerts() {
   const fuelLogs = getFuelLogs() || [];
   let fuelLogsMap = fuelLogs.map((item) => item);
   const settings = getSettings();
-  if (!settings || !fuelLogs || fuelLogs.length === 0) return;
+  // if (!settings || !fuelLogs || fuelLogs.length === 0) return;
 
   const tankCapacity = Number(settings.tank_capacity) || 5;
 
@@ -114,8 +137,8 @@ export function notifyFuelAndServiceAlerts() {
     notifyAlert.push({
       id: Date.now(),
       type: 'Fuel',
-      message: `⛽ Bensin hampir habis, prediksi sisa jarak ${stats.remainingRange} km`,
-      status: 'unread',
+      message: `⛽ Bahan bakar hampir habis, prediksi sisa jarak ${stats.remainingRange} km`,
+      status: 'read',
       is_complete: false,
       date: new Date().toISOString().split('T')[0],
     });
@@ -134,7 +157,7 @@ export function notifyFuelAndServiceAlerts() {
         id: serviceLog.id,
         type: 'Service',
         message: `⚙️ Waktunya servis berkala pada jarak ${formatNumber(nextDue)} km, untuk komponen ${serviceLog.component}`,
-        status: 'unread',
+        status: 'read',
         is_complete: serviceLog.is_complete,
         date: new Date().toISOString().split('T')[0],
       });

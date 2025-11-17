@@ -1,10 +1,28 @@
+// =======================================
+// NotificationService.js (Complete Module)
+// =======================================
+
 import notifee, {
   AndroidImportance,
-  RepeatFrequency,
   TriggerType,
+  RepeatFrequency,
+  EventType,
 } from '@notifee/react-native';
+import { Platform, Linking } from 'react-native';
 
-export async function ensureChannel() {
+
+import { runFuelCheckAndReschedule, runServiceCheck } from './AlertNotificationScheduler';
+
+
+
+// ----- Navigation Ref (set dari App.js)
+export let navRef = null;
+export const setNavRef = (ref) => (navRef = ref);
+
+// =======================================
+// 1. CHANNEL
+// =======================================
+export async function ensureDefaultChannel() {
   return notifee.createChannel({
     id: 'default',
     name: 'Default',
@@ -12,127 +30,247 @@ export async function ensureChannel() {
   });
 }
 
+// =======================================
+// 2. PERMISSION
+// =======================================
 export async function requestNotifPermission() {
-  // Android 13+ akan menampilkan prompt permission
   try {
     await notifee.requestPermission();
   } catch (e) {
-    console.warn('requestPermission error', e);
+    console.warn('Permission Error:', e);
   }
 }
 
-/** Tampilkan notifikasi lokal segera */
-export async function showLocalNotification({ title = 'Hello', body = 'This is a local notification' } = {}) {
-  const channelId = await ensureChannel();
+// =======================================
+// 3. IMMEDIATE NOTIFICATION
+// =======================================
+export async function showNotification({
+  title = 'Hello',
+  body = 'This is a notification',
+  data = {},
+} = {}) {
+  const channelId = await ensureDefaultChannel();
 
   await notifee.displayNotification({
     title,
     body,
+    data,
     android: {
       channelId,
-      smallIcon: 'ic_launcher', // ganti dengan ic_notification jika sudah menambahkan icon khusus
+      smallIcon: 'ic_launcher',
       pressAction: { id: 'open' },
     },
   });
 }
 
-/**
- * Schedule notifikasi dalam N detik dari sekarang
- */
-export async function scheduleInSeconds(seconds, { title = 'Reminder', body = 'Terjadwal' } = {}) {
-  const channelId = await ensureChannel();
+// =======================================
+// 4. SCHEDULE DELAY (N seconds)
+// =======================================
+export async function scheduleInSeconds(seconds, {
+  title = 'Reminder',
+  body = 'Scheduled',
+  data = {},
+} = {}) {
+  const channelId = await ensureDefaultChannel();
+
   const trigger = {
     type: TriggerType.TIMESTAMP,
     timestamp: Date.now() + seconds * 1000,
-    // Opsional: gunakan AlarmManager untuk keandalan (Android)
     alarmManager: true,
+    exact: true,
   };
 
   await notifee.createTriggerNotification(
     {
       title,
       body,
+      data,
       android: {
         channelId,
-        smallIcon: 'ic_launcher', // ganti dengan ic_notification jika sudah menambahkan icon khusus
+        smallIcon: 'ic_launcher',
         pressAction: { id: 'open' },
+        reboot: true,
       },
     },
     trigger
   );
 }
 
-/**
- * Schedule pada tanggal/jam tertentu (Date object)
- */
-export async function scheduleAt(date, { title = 'Reminder', body = 'Waktunya!' } = {}) {
-  const channelId = await ensureChannel();
-  const when = date.getTime();
-
+// =======================================
+// 5. SCHEDULE AT DATE
+// =======================================
+export async function scheduleAt(date, {
+  title = 'Reminder',
+  body = 'Waktunya!',
+  data = {},
+} = {}) {
+  const channelId = await ensureDefaultChannel();
   const trigger = {
     type: TriggerType.TIMESTAMP,
-    timestamp: when,
+    timestamp: date.getTime(),
     alarmManager: true,
+    exact: true,
   };
 
   await notifee.createTriggerNotification(
     {
       title,
       body,
-      android: { channelId, smallIcon: 'ic_launcher', pressAction: { id: 'open' } },
+      data,
+      android: {
+        channelId,
+        smallIcon: 'ic_launcher',
+        pressAction: { id: 'open' },
+        reboot: true,
+      },
     },
     trigger
   );
 }
 
-/**
- * Schedule harian pada jam:menit (mis: 9:00 setiap hari)
- */
-export async function scheduleDaily(hour, minute, { title = 'Pengingat Harian', body = 'Sudah waktunya' } = {}) {
-  const channelId = await ensureChannel();
+// =======================================
+// 6. DAILY AT HH:mm
+// =======================================
+export async function scheduleDaily(hour, minute, {
+  title = 'Pengingat Harian',
+  body = 'Sudah waktunya',
+  data = {},
+} = {}) {
+  const channelId = await ensureDefaultChannel();
 
   const now = new Date();
   const next = new Date();
   next.setHours(hour, minute, 0, 0);
-  if (next.getTime() <= now.getTime()) {
-    // jika waktu sudah lewat hari ini, jadwalkan besok
-    next.setDate(next.getDate() + 1);
-  }
+  if (next <= now) next.setDate(next.getDate() + 1);
 
   const trigger = {
     type: TriggerType.TIMESTAMP,
     timestamp: next.getTime(),
-    repeatFrequency: RepeatFrequency.DAILY, // akan berulang setiap hari pada waktu yang sama
+    repeatFrequency: RepeatFrequency.DAILY,
     alarmManager: true,
+    exact: true,
   };
 
   await notifee.createTriggerNotification(
     {
       title,
       body,
-      android: { channelId, smallIcon: 'ic_launcher', pressAction: { id: 'open' } },
+      data,
+      android: {
+        channelId,
+        smallIcon: 'ic_launcher',
+        pressAction: { id: 'open' },
+        reboot: true,
+      },
     },
     trigger
   );
 }
 
-/**
- * Melihat daftar notifikasi yang terjadwal
- */
-export async function getAllScheduled() {
-  return notifee.getTriggerNotifications();
+// =======================================
+// 7. WEEKLY (e.g. setiap Senin 09:00)
+// =======================================
+export async function scheduleWeekly(dayIndex, hour, minute, {
+  title = 'Pengingat Mingguan',
+  body = 'Sudah waktunya!',
+  data = {},
+} = {}) {
+  // dayIndex = 0 Minggu, 1 Senin, dst.
+  const channelId = await ensureDefaultChannel();
+
+  const now = new Date();
+  const next = new Date();
+
+  next.setDate(
+    now.getDate() + ((dayIndex + 7 - now.getDay()) % 7)
+  );
+  next.setHours(hour, minute, 0, 0);
+
+  if (next <= now) next.setDate(next.getDate() + 7);
+
+  const trigger = {
+    type: TriggerType.TIMESTAMP,
+    timestamp: next.getTime(),
+    repeatFrequency: RepeatFrequency.WEEKLY,
+    alarmManager: true,
+    exact: true,
+  };
+
+  await notifee.createTriggerNotification(
+    {
+      title,
+      body,
+      data,
+      android: {
+        channelId,
+        smallIcon: 'ic_launcher',
+        pressAction: { id: 'open' },
+        reboot: true,
+      },
+    },
+    trigger
+  );
 }
 
-/**
- * Batalkan semua notifikasi terjadwal
- */
-export async function cancelAllScheduled() {
-  await notifee.cancelTriggerNotifications();
+// =======================================
+// 8. GET / CANCEL SCHEDULED
+// =======================================
+export const getScheduled = () => notifee.getTriggerNotifications();
+export const cancelAllScheduled = () => notifee.cancelTriggerNotifications();
+export const cancelById = (id) => notifee.cancelTriggerNotification(id);
+
+// =======================================
+// 9. NOTIFICATION PRESS HANDLER
+// =======================================
+export function setupNotificationHandlers() {
+  notifee.onBackgroundEvent(async ({ type, detail }) => {
+    const { notification } = detail;
+    console.log("notification ",notification);
+    
+
+    if (notification?.data?.type === 'FUEL_CHECK_RUN') {
+      await runFuelCheckAndReschedule();
+      return;
+    }
+
+    if (notification?.data?.type === 'SERVICE_CHECK_RUN') {
+      await runServiceCheck();
+      return;
+    }
+
+    // Press → navigate
+    if (type === EventType.PRESS) {
+      onPress(notification);
+    }
+  });
+
+  notifee.onForegroundEvent(({ type, detail }) => {
+    if (type === EventType.PRESS) onPress(detail.notification);
+  });
 }
 
-/**
- * Batalkan notifikasi terjadwal tertentu (berdasarkan notification.id)
- */
-export async function cancelScheduledById(notificationId) {
-  await notifee.cancelTriggerNotification(notificationId);
+
+
+function onPress(notification) {
+  const route = notification?.data?.route;
+  if (route && navRef?.current) {
+    navRef.current.navigate(route, notification.data);
+  }
 }
+
+// =======================================
+// 10. HELPER: OPEN AUTOSTART SETTINGS
+// =======================================
+export const openAutoStart = () => {
+  const intents = [
+    'miui.intent.action.OP_AUTO_START',
+    'com.miui.securitycenter/com.miui.permcenter.autostart.AutoStartManagementActivity',
+    'oppo.intent.action.OPPO_AUTO_START',
+    'com.coloros.safecenter/.startupapp.StartupAppListActivity',
+    'com.vivo.permissionmanager/.activity.BgStartUpManagerActivity',
+  ];
+
+  intents.forEach((intent) => {
+    Linking.openSettings(intent).catch(() => {});
+  });
+};

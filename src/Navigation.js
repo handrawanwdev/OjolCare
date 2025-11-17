@@ -12,6 +12,8 @@ import SettingsScreen from "./screens/Settings/SettingsScreen";
 const Tab = createBottomTabNavigator();
 
 export default function Navigation() {
+
+
   return (
     <NavigationContainer>
       <Tab.Navigator
